@@ -1,0 +1,40 @@
++*In[14]:*+
+[source, ipython3]
+----
+import pandas as pd
+
+# Load the dataset (adjust file path if needed)
+df = pd.read_csv('marketing_campaign.csv', sep='\t')
+
+# 1. Remove duplicates
+df = df.drop_duplicates()
+
+# 2. Handle null values
+df = df.dropna()
+
+# 3. Fix inconsistent column formats
+# Strip whitespaces and lowercase string columns
+str_cols = df.select_dtypes(include='object').columns
+for col in str_cols:
+    df[col] = df[col].str.strip().str.lower()
+
+# 4. Convert 'Dt_Customer' to datetime if it exists
+if any(col.strip().lower() == 'dt_customer' for col in df.columns):
+    df.rename(columns=lambda x: x.strip(), inplace=True)  # remove column name spaces
+    df['Dt_Customer'] = pd.to_datetime(df['Dt_Customer'], format='%d-%m-%Y', errors='coerce')
+    df = df.dropna(subset=['Dt_Customer'])
+
+# 5. Reset index
+df.reset_index(drop=True, inplace=True)
+
+# Save cleaned dataset
+df.to_csv('cleaned_marketing_campaign.csv', index=False)
+
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
